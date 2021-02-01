@@ -301,7 +301,10 @@ The database automatically reopens when a user tries to use the database again. 
 OFF         
 The database remains open after the last user exits.
 
-The AUTO_CLOSE option is useful for desktop databases because it allows for database files to be managed as regular files. They can be moved, copied to make backups, or even e-mailed to other users. The AUTO_CLOSE process is asynchronous; repeatedly opening and closing the database doesn't reduce performance.
+The AUTO_CLOSE option is useful for desktop databases because it allows for database files to be managed as regular files. They can be moved, copied to make backups, or even e-mailed to other users. The AUTO_CLOSE process is asynchronous; repeatedly opening and closing the database doesn't reduce performance of SQL Server.    
+
+After a database is shutdown, next time an application attempts to use the database, the database has to be first opened and then get the status to online. This could take some time and can result in application time outs. 
+
 
 > [!NOTE]
 > The AUTO_CLOSE option isn't available in a Contained Database or on [!INCLUDE[ssSDS](../../includes/sssds-md.md)].
@@ -309,7 +312,9 @@ The AUTO_CLOSE option is useful for desktop databases because it allows for data
 >
 > When AUTO_CLOSE is ON, some columns in the [sys.databases](../../relational-databases/system-catalog-views/sys-databases-transact-sql.md) catalog view and DATABASEPROPERTYEX function will return NULL because the database is unavailable to retrieve the data. To resolve this, execute a USE statement to open the database.
 >
-> Database mirroring requires AUTO_CLOSE OFF.
+> Database mirroring requires AUTO_CLOSE OFF.  
+
+> When AUTO_CLOSE is set to ON, VSS backups of the database may fail. For more information review [Non-component VSS backups such as Azure Site Recovery jobs fail on servers hosting SQL Server instances with AUTO_CLOSE DBs](https://docs.microsoft.com/troubleshoot/sql/admin/revocery-jobs-fail-servers). 
 
 When the database is set to AUTOCLOSE = ON, an operation that initiates an automatic database shutdown clears the plan cache for the instance of [!INCLUDE[ssNoVersion](../../includes/ssnoversion-md.md)]. Clearing the plan cache causes a recompilation of all subsequent execution plans and can cause a sudden, temporary decrease in query performance. In [!INCLUDE[ssVersion2005](../../includes/ssversion2005-md.md)] Service Pack 2 and higher, for each cleared cachestore in the plan cache, the [!INCLUDE[ssNoVersion](../../includes/ssnoversion-md.md)] error log contains the following informational message: " [!INCLUDE[ssNoVersion](../../includes/ssnoversion-md.md)] has encountered %d occurrence(s) of cachestore flush for the '%s' cachestore (part of plan cache) due to some database maintenance or reconfigure operations". This message is logged every five minutes as long as the cache is flushed within that time interval.
 
